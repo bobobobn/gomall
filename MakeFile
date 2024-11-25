@@ -1,0 +1,5 @@
+
+.PHONY: gen-frontend
+gen-frontend:
+	@cd app/frontend && cwgo server -I ../../idl --type HTTP --service frontend --module  ${ROOT_MOD}/app/frontend --idl ../../idl/frontend/auth_page.proto
+	cwgo server --type HTTP --idl  ../../idl/frontend/auth_page.proto  --service frontend -module gomall/app/frontend -I ../../idl/
