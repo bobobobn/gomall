@@ -68,7 +68,7 @@ func (x *Product) fastReadField3(buf []byte, _type int8) (offset int, err error)
 }
 
 func (x *Product) fastReadField4(buf []byte, _type int8) (offset int, err error) {
-	x.Pic, offset, err = fastpb.ReadString(buf, _type)
+	x.Picture, offset, err = fastpb.ReadString(buf, _type)
 	return offset, err
 }
 
@@ -299,10 +299,10 @@ func (x *Product) fastWriteField3(buf []byte) (offset int) {
 }
 
 func (x *Product) fastWriteField4(buf []byte) (offset int) {
-	if x.Pic == "" {
+	if x.Picture == "" {
 		return offset
 	}
-	offset += fastpb.WriteString(buf[offset:], 4, x.GetPic())
+	offset += fastpb.WriteString(buf[offset:], 4, x.GetPicture())
 	return offset
 }
 
@@ -469,10 +469,10 @@ func (x *Product) sizeField3() (n int) {
 }
 
 func (x *Product) sizeField4() (n int) {
-	if x.Pic == "" {
+	if x.Picture == "" {
 		return n
 	}
-	n += fastpb.SizeString(4, x.GetPic())
+	n += fastpb.SizeString(4, x.GetPicture())
 	return n
 }
 
@@ -606,7 +606,7 @@ var fieldIDToName_Product = map[int32]string{
 	1: "Id",
 	2: "Name",
 	3: "Description",
-	4: "Pic",
+	4: "Picture",
 	5: "Price",
 }
 

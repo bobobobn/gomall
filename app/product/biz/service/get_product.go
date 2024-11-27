@@ -27,7 +27,7 @@ func (s *GetProductService) Run(req *product.GetProductReq) (resp *product.GetPr
 			Id:          uint32(p.ID),
 			Name:        p.Name,
 			Description: p.Description,
-			Pic:         p.Picture,
+			Picture:     p.Picture,
 			Price:       p.Price,
 		},
 	}

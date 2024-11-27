@@ -3,6 +3,7 @@ package mysql
 import (
 	"fmt"
 	"gomall/app/product/biz/model"
+	"gomall/app/product/conf"
 	"os"
 
 	"gorm.io/driver/mysql"
@@ -15,7 +16,7 @@ var (
 )
 
 func Init() {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+	dsn := fmt.Sprintf(conf.GetConf().MySQL.DSN,
 		os.Getenv("MYSQL_USER"),
 		os.Getenv("MYSQL_PASSWORD"),
 		os.Getenv("MYSQL_HOST"),

@@ -33,7 +33,7 @@ func (s *ListProductsService) Run(req *product.ListProductsReq) (resp *product.L
 			Name:        p.Name,
 			Price:       p.Price,
 			Description: p.Description,
-			Pic:         p.Picture,
+			Picture:     p.Picture,
 		})
 	}
 	return
