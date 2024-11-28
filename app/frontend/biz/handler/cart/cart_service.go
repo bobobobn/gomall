@@ -47,6 +47,7 @@ func GetCart(ctx context.Context, c *app.RequestContext) {
 		utils.SendErrResponse(ctx, c, consts.StatusOK, err)
 		return
 	}
+	utils.WarpResponse(ctx, c, resp)
 	c.HTML(consts.StatusOK, "cart", resp)
 
 }

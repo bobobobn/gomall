@@ -26,7 +26,7 @@ func Auth() app.HandlerFunc {
 		session := sessions.Default(c)
 		user_id := session.Get("user_id")
 		if user_id == nil {
-			c.Redirect(302, []byte("/login?next="+c.FullPath()))
+			c.Redirect(302, []byte("/sign-in?next="+c.FullPath()))
 			c.Abort()
 			return
 		}

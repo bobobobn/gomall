@@ -48,9 +48,13 @@ func main() {
 		ctx.JSON(consts.StatusOK, utils.H{"ping": "pong"})
 	})
 	h.GET("/sign-in", func(c context.Context, ctx *app.RequestContext) {
+		next := ctx.Query("next")
+		if next == "" {
+			next = ctx.Request.Header.Get("referer")
+		}
 		data := utils.H{
 			"Title": "Sign In",
-			"next":  ctx.Request.Header.Get("referer"),
+			"next":  next,
 		}
 		ctx.HTML(consts.StatusOK, "sign-in", data)
 	})

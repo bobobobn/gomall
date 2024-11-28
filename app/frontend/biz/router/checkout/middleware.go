@@ -3,12 +3,14 @@
 package checkout
 
 import (
+	"gomall/app/frontend/middleware"
+
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
 func rootMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{middleware.Auth()}
 }
 
 func _checkoutMw() []app.HandlerFunc {
