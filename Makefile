@@ -14,3 +14,13 @@ gen-cart:
 gen-product:
 	@cd rpc_gen && cwgo client --type RPC --idl  ../idl/product.proto  --service product --I ../idl/ --module gomall.local/rpc_gen
 	@cd app/product && cwgo server --type RPC --idl  ../../idl/product.proto --service product --I ../../idl/ --module gomall/app/product --pass "-use gomall.local/rpc_gen/kitex_gen"
+
+.PHONY: gen-payment
+gen-payment:
+	@cd rpc_gen && cwgo client --type RPC --idl  ../idl/payment.proto  --service payment --I ../idl/ --module gomall.local/rpc_gen
+	@mkdir -p app/payment && cd app/payment && cwgo server --type RPC --idl  ../../idl/payment.proto --service payment --I ../../idl/ --module gomall/app/payment --pass "-use gomall.local/rpc_gen/kitex_gen"
+
+.PHONY: gen-checkout
+gen-checkout:
+	@cd rpc_gen && cwgo client --type RPC --idl  ../idl/checkout.proto  --service checkout --I ../idl/ --module gomall.local/rpc_gen
+	@mkdir -p app/checkout && cd app/checkout && cwgo server --type RPC --idl  ../../idl/checkout.proto --service checkout --I ../../idl/ --module gomall/app/checkout --pass "-use gomall.local/rpc_gen/kitex_gen"cwgo server --type HTTP --idl  ../../idl/frontend/auth_page.proto  --service frontend -module gomall/app/frontend -I ../../idl/

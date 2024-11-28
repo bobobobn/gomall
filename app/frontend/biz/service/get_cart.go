@@ -23,11 +23,11 @@ func NewGetCartService(Context context.Context, RequestContext *app.RequestConte
 }
 
 type itemsCart struct {
-	Id       int64
-	Name     string
-	Price    string
-	Quantity int32
-	Picture  string
+	Id      int64
+	Name    string
+	Price   string
+	Qty     int32
+	Picture string
 }
 
 func (h *GetCartService) Run(req *cart.Empty) (resp map[string]any, err error) {
@@ -46,11 +46,11 @@ func (h *GetCartService) Run(req *cart.Empty) (resp map[string]any, err error) {
 		}
 
 		items = append(items, itemsCart{
-			Id:       int64(item.ProductId),
-			Name:     p.Product.Name,
-			Price:    strconv.FormatFloat(float64(p.Product.Price), 'f', 2, 64),
-			Quantity: int32(item.Quantity),
-			Picture:  p.Product.Picture,
+			Id:      int64(item.ProductId),
+			Name:    p.Product.Name,
+			Price:   strconv.FormatFloat(float64(p.Product.Price), 'f', 2, 64),
+			Qty:     int32(item.Quantity),
+			Picture: p.Product.Picture,
 		})
 		totalPrice += float64(p.Product.Price) * float64(item.Quantity)
 	}

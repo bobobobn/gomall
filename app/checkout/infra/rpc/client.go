@@ -1,43 +1,29 @@
 package rpc
 
 import (
-	"gomall/app/frontend/conf"
+	"gomall/app/checkout/conf"
 	"sync"
 
 	"github.com/cloudwego/kitex/client"
 	consul "github.com/kitex-contrib/registry-consul"
 	"gomall.local/rpc_gen/kitex_gen/cart/cartservice"
-	"gomall.local/rpc_gen/kitex_gen/checkout/checkoutservice"
+	"gomall.local/rpc_gen/kitex_gen/payment/paymentservice"
 	"gomall.local/rpc_gen/kitex_gen/product/productservice"
-	"gomall.local/rpc_gen/kitex_gen/user/userservice"
 )
 
 var (
-	UserClient     userservice.Client
-	ProductClient  productservice.Client
-	CartClient     cartservice.Client
-	CheckoutCLient checkoutservice.Client
-	once           sync.Once
+	ProductClient productservice.Client
+	CartClient    cartservice.Client
+	PaymentClient paymentservice.Client
+	once          sync.Once
 )
 
 func InitClient() {
 	once.Do(func() {
-		InitUserClient()
 		InitProductClient()
 		InitCartClient()
-		InitCheckoutClient()
+		InitpaymentClient()
 	})
-}
-
-func InitUserClient() {
-	r, err := consul.NewConsulResolver(conf.GetConf().Registry.RegistryAddress[0])
-	if err != nil {
-		panic(err)
-	}
-	UserClient, err = userservice.NewClient("user", client.WithResolver(r))
-	if err != nil {
-		panic(err)
-	}
 }
 
 func InitProductClient() {
@@ -62,12 +48,12 @@ func InitCartClient() {
 	}
 }
 
-func InitCheckoutClient() {
+func InitpaymentClient() {
 	r, err := consul.NewConsulResolver(conf.GetConf().Registry.RegistryAddress[0])
 	if err != nil {
 		panic(err)
 	}
-	CheckoutCLient, err = checkoutservice.NewClient("checkout", client.WithResolver(r))
+	PaymentClient, err = paymentservice.NewClient("payment", client.WithResolver(r))
 	if err != nil {
 		panic(err)
 	}
