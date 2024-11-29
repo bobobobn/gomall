@@ -7,6 +7,7 @@ import (
 	"github.com/cloudwego/kitex/client"
 	consul "github.com/kitex-contrib/registry-consul"
 	"gomall.local/rpc_gen/kitex_gen/cart/cartservice"
+	"gomall.local/rpc_gen/kitex_gen/order/orderservice"
 	"gomall.local/rpc_gen/kitex_gen/payment/paymentservice"
 	"gomall.local/rpc_gen/kitex_gen/product/productservice"
 )
@@ -15,6 +16,7 @@ var (
 	ProductClient productservice.Client
 	CartClient    cartservice.Client
 	PaymentClient paymentservice.Client
+	OrderClient   orderservice.Client
 	once          sync.Once
 )
 
@@ -23,6 +25,7 @@ func InitClient() {
 		InitProductClient()
 		InitCartClient()
 		InitpaymentClient()
+		InitOrderClient()
 	})
 }
 
@@ -54,6 +57,17 @@ func InitpaymentClient() {
 		panic(err)
 	}
 	PaymentClient, err = paymentservice.NewClient("payment", client.WithResolver(r))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func InitOrderClient() {
+	r, err := consul.NewConsulResolver(conf.GetConf().Registry.RegistryAddress[0])
+	if err != nil {
+		panic(err)
+	}
+	OrderClient, err = orderservice.NewClient("order", client.WithResolver(r))
 	if err != nil {
 		panic(err)
 	}

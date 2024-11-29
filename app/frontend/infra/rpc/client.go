@@ -8,6 +8,7 @@ import (
 	consul "github.com/kitex-contrib/registry-consul"
 	"gomall.local/rpc_gen/kitex_gen/cart/cartservice"
 	"gomall.local/rpc_gen/kitex_gen/checkout/checkoutservice"
+	"gomall.local/rpc_gen/kitex_gen/order/orderservice"
 	"gomall.local/rpc_gen/kitex_gen/product/productservice"
 	"gomall.local/rpc_gen/kitex_gen/user/userservice"
 )
@@ -17,6 +18,7 @@ var (
 	ProductClient  productservice.Client
 	CartClient     cartservice.Client
 	CheckoutCLient checkoutservice.Client
+	OrderClient    orderservice.Client
 	once           sync.Once
 )
 
@@ -26,6 +28,7 @@ func InitClient() {
 		InitProductClient()
 		InitCartClient()
 		InitCheckoutClient()
+		InitOrderClient()
 	})
 }
 
@@ -68,6 +71,17 @@ func InitCheckoutClient() {
 		panic(err)
 	}
 	CheckoutCLient, err = checkoutservice.NewClient("checkout", client.WithResolver(r))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func InitOrderClient() {
+	r, err := consul.NewConsulResolver(conf.GetConf().Registry.RegistryAddress[0])
+	if err != nil {
+		panic(err)
+	}
+	OrderClient, err = orderservice.NewClient("order", client.WithResolver(r))
 	if err != nil {
 		panic(err)
 	}

@@ -24,3 +24,8 @@ gen-payment:
 gen-checkout:
 	@cd rpc_gen && cwgo client --type RPC --idl  ../idl/checkout.proto  --service checkout --I ../idl/ --module gomall.local/rpc_gen
 	@mkdir -p app/checkout && cd app/checkout && cwgo server --type RPC --idl  ../../idl/checkout.proto --service checkout --I ../../idl/ --module gomall/app/checkout --pass "-use gomall.local/rpc_gen/kitex_gen"cwgo server --type HTTP --idl  ../../idl/frontend/auth_page.proto  --service frontend -module gomall/app/frontend -I ../../idl/
+
+.PHONY: gen-order
+gen-order:
+	@cd rpc_gen && cwgo client --type RPC --idl  ../idl/order.proto  --service order --I ../idl/ --module gomall.local/rpc_gen
+	@mkdir -p app/order && cd app/order && cwgo server --type RPC --idl  ../../idl/order.proto --service order --I ../../idl/ --module gomall/app/order --pass "-use gomall.local/rpc_gen/kitex_gen"cwgo server --type HTTP --idl  ../../idl/frontend/auth_page.proto  --service frontend -module gomall/app/frontend -I ../../idl/

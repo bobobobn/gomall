@@ -5,9 +5,9 @@ import (
 	"gomall/app/checkout/infra/rpc"
 
 	"github.com/cloudwego/kitex/pkg/kerrors"
-	"github.com/google/uuid"
 	"gomall.local/rpc_gen/kitex_gen/cart"
 	checkout "gomall.local/rpc_gen/kitex_gen/checkout"
+	"gomall.local/rpc_gen/kitex_gen/order"
 	"gomall.local/rpc_gen/kitex_gen/payment"
 	"gomall.local/rpc_gen/kitex_gen/product"
 )
@@ -29,6 +29,7 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		return nil, kerrors.NewGRPCBizStatusError(3005001, err.Error())
 	}
 	var total float32 = 0.0
+	var orderItems []*order.OrderItem
 	for _, item := range cartResp.Items {
 		p, err := rpc.ProductClient.GetProduct(s.ctx, &product.GetProductReq{
 			Id: int64(item.ProductId),
@@ -37,10 +38,32 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 			return nil, kerrors.NewGRPCBizStatusError(2005001, err.Error())
 		}
 		total += float32(item.Quantity) * p.Product.Price
+		orderItems = append(orderItems, &order.OrderItem{
+			Item: &cart.CartItem{
+				ProductId: item.ProductId,
+				Quantity:  item.Quantity,
+			},
+			Cost: float32(item.Quantity) * p.Product.Price,
+		})
 	}
 
 	//todo order service
-	order_id := uuid.New().String()
+	orderResp, err := rpc.OrderClient.PlaceOrder(s.ctx, &order.PlaceOrderReq{
+		UserId: req.UserId,
+		Address: &order.Address{
+			StreetAddress: req.Address.StreetAddress,
+			City:          req.Address.City,
+			State:         req.Address.State,
+			Country:       req.Address.Country,
+			ZipCode:       req.Address.ZipCode,
+		},
+		Email: req.Email,
+		Items: orderItems,
+	})
+	if err != nil {
+		return nil, kerrors.NewGRPCBizStatusError(6005002, err.Error())
+	}
+	order_id := orderResp.Order.OrderId
 	r, err := rpc.PaymentClient.Charge(s.ctx, &payment.ChargeReq{
 		UserId:     req.UserId,
 		Amount:     total,
