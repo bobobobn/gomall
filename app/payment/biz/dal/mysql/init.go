@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"fmt"
+	"gomall/app/payment/biz/dal/model"
 	"gomall/app/payment/conf"
 	"os"
 
@@ -27,6 +28,10 @@ func Init() {
 			SkipDefaultTransaction: true,
 		},
 	)
+	if err != nil {
+		panic(err)
+	}
+	err = DB.AutoMigrate(&model.PaymentLog{})
 	if err != nil {
 		panic(err)
 	}

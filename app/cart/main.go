@@ -8,12 +8,12 @@ import (
 	"gomall/app/cart/biz/dal"
 	"gomall/app/cart/conf"
 
+	"github.com/bobobobn/gomall/common/mtl"
+	"github.com/bobobobn/gomall/common/serversuite"
 	"github.com/cloudwego/kitex/pkg/klog"
-	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	"github.com/joho/godotenv"
 	kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
-	consul "github.com/kitex-contrib/registry-consul"
 	"go.uber.org/zap/zapcore"
 	"gomall.local/rpc_gen/kitex_gen/cart/cartservice"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -27,7 +27,7 @@ func main() {
 	}
 	dal.Init()
 	opts := kitexInit()
-
+	mtl.InitMetrics(conf.GetConf().Kitex.Service, conf.GetConf().Kitex.MetricsPort, conf.GetConf().Registry.RegistryAddress[0])
 	svr := cartservice.NewServer(new(CartServiceImpl), opts...)
 
 	err = svr.Run()
@@ -42,16 +42,11 @@ func kitexInit() (opts []server.Option) {
 	if err != nil {
 		panic(err)
 	}
-	r, err := consul.NewConsulRegister(conf.GetConf().Registry.RegistryAddress[0])
-	if err != nil {
-		log.Fatal(err)
-	}
-	opts = append(opts, server.WithRegistry(r))
 	opts = append(opts, server.WithServiceAddr(addr))
 
-	// service info
-	opts = append(opts, server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
-		ServiceName: conf.GetConf().Kitex.Service,
+	opts = append(opts, server.WithSuite(serversuite.CommonServerSuite{
+		CurrentServiceName: conf.GetConf().Kitex.Service,
+		RegistryAddr:       conf.GetConf().Registry.RegistryAddress[0],
 	}))
 
 	// klog

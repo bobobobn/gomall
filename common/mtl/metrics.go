@@ -14,12 +14,15 @@ import (
 
 var Registry *prometheus.Registry
 
-func InitMetrics(serviceName, metricsPort, registryAddr string) {
+func InitMetrics(serviceName, metricsPort, registryAddr string) (registry.Registry, *registry.Info) {
 	Registry = prometheus.NewRegistry()
 	Registry.MustRegister(collectors.NewGoCollector())
 	Registry.MustRegister(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
 	r, _ := consul.NewConsulRegister(registryAddr)
-	addr, _ := net.ResolveTCPAddr("tcp", metricsPort)
+	addr, err := net.ResolveTCPAddr("tcp", metricsPort)
+	if err != nil {
+		panic(err)
+	}
 	registryInfo := &registry.Info{
 		ServiceName: "prometheus",
 		Addr:        addr,
@@ -34,4 +37,5 @@ func InitMetrics(serviceName, metricsPort, registryAddr string) {
 	})
 	http.Handle("/metrics", promhttp.HandlerFor(Registry, promhttp.HandlerOpts{}))
 	go http.ListenAndServe(metricsPort, nil)
+	return r, registryInfo
 }

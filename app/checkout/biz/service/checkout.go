@@ -73,6 +73,12 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 	if err != nil {
 		return nil, kerrors.NewGRPCBizStatusError(4005002, err.Error())
 	}
+	_, err = rpc.CartClient.EmptyCart(s.ctx, &cart.EmptyCartReq{
+		UserId: req.UserId,
+	})
+	if err != nil {
+		return nil, kerrors.NewGRPCBizStatusError(5005003, err.Error())
+	}
 	resp = &checkout.CheckoutResp{
 		OrderId:       order_id,
 		TransactionId: r.TransactionId,

@@ -29,3 +29,8 @@ gen-checkout:
 gen-order:
 	@cd rpc_gen && cwgo client --type RPC --idl  ../idl/order.proto  --service order --I ../idl/ --module gomall.local/rpc_gen
 	@mkdir -p app/order && cd app/order && cwgo server --type RPC --idl  ../../idl/order.proto --service order --I ../../idl/ --module gomall/app/order --pass "-use gomall.local/rpc_gen/kitex_gen"cwgo server --type HTTP --idl  ../../idl/frontend/auth_page.proto  --service frontend -module gomall/app/frontend -I ../../idl/
+
+.PHONY: mod-all
+mod-all:
+	# 遍历所有目录,执行go mod tidy
+	find . -name go.mod -execdir go mod tidy \;

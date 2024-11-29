@@ -13,6 +13,7 @@ import (
 	"gomall/app/frontend/infra/rpc"
 	"gomall/app/frontend/middleware"
 
+	"github.com/bobobobn/gomall/common/mtl"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/middlewares/server/recovery"
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -23,6 +24,7 @@ import (
 	"github.com/hertz-contrib/gzip"
 	"github.com/hertz-contrib/logger/accesslog"
 	hertzlogrus "github.com/hertz-contrib/logger/logrus"
+	prometheus "github.com/hertz-contrib/monitor-prometheus"
 	"github.com/hertz-contrib/pprof"
 	"github.com/hertz-contrib/sessions"
 	"github.com/hertz-contrib/sessions/redis"
@@ -39,8 +41,13 @@ func main() {
 	}
 	dal.Init()
 	rpc.InitClient()
+	r, rInfo := mtl.InitMetrics(conf.GetConf().Hertz.Service, conf.GetConf().Hertz.MetricsPort, conf.GetConf().Registry.RegistryAddress[0])
+	defer r.Deregister(rInfo)
 	address := conf.GetConf().Hertz.Address
-	h := server.New(server.WithHostPorts(address))
+	h := server.New(server.WithHostPorts(address),
+		server.WithTracer(prometheus.NewServerTracer("", "",
+			prometheus.WithDisableServer(true), prometheus.WithRegistry(mtl.Registry))),
+	)
 
 	registerMiddleware(h)
 	// add a ping route to test

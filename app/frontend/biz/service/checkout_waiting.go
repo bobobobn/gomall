@@ -9,6 +9,7 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	rpccheckout "gomall.local/rpc_gen/kitex_gen/checkout"
+	"gomall.local/rpc_gen/kitex_gen/payment"
 )
 
 type CheckoutWaitingService struct {
@@ -19,7 +20,6 @@ type CheckoutWaitingService struct {
 func NewCheckoutWaitingService(Context context.Context, RequestContext *app.RequestContext) *CheckoutWaitingService {
 	return &CheckoutWaitingService{RequestContext: RequestContext, Context: Context}
 }
-
 func (h *CheckoutWaitingService) Run(req *checkout.CheckoutReq) (resp map[string]any, err error) {
 	_, err = rpc.CheckoutCLient.Checkout(h.Context, &rpccheckout.CheckoutReq{
 		UserId:    utils.GetUserIdFromCtx(h.Context),
@@ -32,6 +32,12 @@ func (h *CheckoutWaitingService) Run(req *checkout.CheckoutReq) (resp map[string
 			State:         req.Province,
 			Country:       req.Country,
 			ZipCode:       req.Zipcode,
+		},
+		CreditCard: &payment.CreditCardInfo{
+			CreditCardNumber:          req.CardNum,
+			CreditCardCvv:             req.Cvv,
+			CreditCardExpirationYear:  req.ExpirationYear,
+			CreditCardExpirationMonth: req.ExpirationMonth,
 		},
 	})
 	if err != nil {

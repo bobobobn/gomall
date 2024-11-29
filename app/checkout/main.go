@@ -8,23 +8,30 @@ import (
 	"gomall/app/checkout/conf"
 	"gomall/app/checkout/infra/rpc"
 
+	"github.com/bobobobn/gomall/common/mtl"
+	"github.com/bobobobn/gomall/common/serversuite"
 	"github.com/cloudwego/kitex/pkg/klog"
-	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
+	"github.com/joho/godotenv"
 	kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
-	consul "github.com/kitex-contrib/registry-consul"
 	"go.uber.org/zap/zapcore"
 	"gomall.local/rpc_gen/kitex_gen/checkout/checkoutservice"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 func main() {
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+	// dal.Init()
 	opts := kitexInit()
 	rpc.InitClient()
-
+	mtl.InitMetrics(conf.GetConf().Kitex.Service, conf.GetConf().Kitex.MetricsPort, conf.GetConf().Registry.RegistryAddress[0])
 	svr := checkoutservice.NewServer(new(CheckoutServiceImpl), opts...)
 
-	err := svr.Run()
+	err = svr.Run()
 	if err != nil {
 		klog.Error(err.Error())
 	}
@@ -38,14 +45,9 @@ func kitexInit() (opts []server.Option) {
 	}
 	opts = append(opts, server.WithServiceAddr(addr))
 
-	r, err := consul.NewConsulRegister(conf.GetConf().Registry.RegistryAddress[0])
-	if err != nil {
-		log.Fatal(err)
-	}
-	opts = append(opts, server.WithRegistry(r))
-	// service info
-	opts = append(opts, server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
-		ServiceName: conf.GetConf().Kitex.Service,
+	opts = append(opts, server.WithSuite(serversuite.CommonServerSuite{
+		CurrentServiceName: conf.GetConf().Kitex.Service,
+		RegistryAddr:       conf.GetConf().Registry.RegistryAddress[0],
 	}))
 
 	// klog
